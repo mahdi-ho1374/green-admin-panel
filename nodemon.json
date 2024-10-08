@@ -1,0 +1,7 @@
+{
+  "watchers": {"limit": 524288},
+  "watch": ["src"],
+  "ext": ".ts,.js",
+  "ignore": [],
+  "exec": "ts-node ./src/app.ts"
+}
