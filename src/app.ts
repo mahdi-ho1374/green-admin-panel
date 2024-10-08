@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
-import process from "process";
 import cors from "cors";
 import bodyParser from "body-parser";
 import productRouter from "./routes/product";
@@ -16,7 +15,7 @@ import runScheduledTask from "./scheduledTask/runScheduledTask";
 const app = express();
 
 const corsOptions = {
-  origin: "*",
+  origin: process.env.FRONTEND_URL,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   credentials: true,
   optionsSuccessStatus: 204,
