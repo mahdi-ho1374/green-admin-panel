@@ -7,7 +7,7 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const createSomeFakeData_1 = __importDefault(require("./tasks/createSomeFakeData"));
 const updateLowStockProducts_1 = __importDefault(require("./tasks/updateLowStockProducts"));
-const filePath = path_1.default.join(__dirname, "..", "scheduledTaskStatus.json");
+const filePath = path_1.default.join(__dirname, "..", "..", "scheduledTaskStatus.json");
 const runScheduledTask = () => {
     const data = JSON.parse(fs_1.default.readFileSync(filePath, "utf-8"));
     const today = new Date().toLocaleDateString();

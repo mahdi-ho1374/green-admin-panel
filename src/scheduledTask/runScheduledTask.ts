@@ -6,6 +6,7 @@ import updateLowStockProducts from "./tasks/updateLowStockProducts";
 const filePath = path.join(
   __dirname,
   "..",
+  "..",
   "scheduledTaskStatus.json"
 );
 
