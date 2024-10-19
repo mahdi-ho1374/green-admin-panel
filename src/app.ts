@@ -10,27 +10,57 @@ import commentRouter from "./routes/comment";
 import dashboardRouter from "./routes/dashboard";
 import { Erroro } from "./models/error";
 import helmet from "helmet";
-import runScheduledTask from "./scheduledTask/runScheduledTask";
+import createSomeFakeData from "./scheduledTasks/createSomeFakeData";
+import updateLowStockProducts from "./scheduledTasks/updateLowStockProducts";
+
+if (process.env.NODE_ENV !== "production") {
+  const dotenv = require("dotenv");
+  dotenv.config();
+}
 
 const app = express();
 
 const corsOptions = {
-  origin: process.env.FRONTEND_URL,
+  origin: function (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void
+  ) {
+    const allowedOrigins = [process.env.FRONTEND_URL, "https://github.com"];
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   credentials: true,
   optionsSuccessStatus: 204,
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-app.use((req: Request, res: Response, next: NextFunction) => {
-  runScheduledTask();
-  next();
-});
-
 app.use(helmet());
 app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
+
+app.get(
+  "/admin/run-scheduled-task",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const authHeader = req.headers["authorization"];
+      const token = authHeader && authHeader.split(" ")[1];
+      if (!token || token !== process.env.SECRET_TOKEN) {
+        res.status(403).json({ error: "Unauthorized" });
+        return;
+      }
+      await createSomeFakeData();
+      await updateLowStockProducts();
+      res.status(200).json({ message: "Scheduled task executed successfully" });
+    } catch (err: any) {
+      next(err);
+    }
+  }
+);
 
 app.use("/admin", productRouter);
 app.use("/admin", userRouter);
@@ -50,7 +80,7 @@ mongoose
     `mongodb+srv://${process.env.MONGO_USERNAME}:${process.env.MONGO_PASSWORD}@admin-panel.czwa6yt.mongodb.net/${process.env.MONGO_DATABASE}`
   )
   .then((result) => {
-    app.listen(process.env.PORT || 3000);
+    app.listen(process.env.PORT || 8080);
   })
   .catch((error) => {});
 

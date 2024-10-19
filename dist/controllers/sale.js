@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -8,9 +17,9 @@ const sale_1 = __importDefault(require("../helpers/pipelines/chart/sale"));
 const order_1 = __importDefault(require("../models/order"));
 const combineChartData_1 = __importDefault(require("../helpers/pipelines/chart/combineChartData"));
 const order_2 = require("../types/order");
-const getMostSoldProducts = async (req, res, next) => {
+const getMostSoldProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const aggregatedMostSoldProducts = await order_1.default.aggregate([
+        const aggregatedMostSoldProducts = yield order_1.default.aggregate([
             {
                 $match: {
                     status: { $ne: order_2.Status.CANCELED },
@@ -94,19 +103,17 @@ const getMostSoldProducts = async (req, res, next) => {
                 },
             },
         ]);
-        const mostSoldProducts = aggregatedMostSoldProducts[0].revenue.map((item, index) => ({
-            ...item, month: item._id.month, year: item._id.year, ...aggregatedMostSoldProducts[0].amount[index]
-        }));
+        const mostSoldProducts = aggregatedMostSoldProducts[0].revenue.map((item, index) => (Object.assign(Object.assign(Object.assign({}, item), { month: item._id.month, year: item._id.year }), aggregatedMostSoldProducts[0].amount[index])));
         res.status(200).json(mostSoldProducts);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const getTopBuyers = async (req, res, next) => {
+});
+const getTopBuyers = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let aggregatedTopBuyers = await order_1.default.aggregate([
+        let aggregatedTopBuyers = yield order_1.default.aggregate([
             {
                 $match: {
                     status: { $ne: order_2.Status.CANCELED },
@@ -196,24 +203,22 @@ const getTopBuyers = async (req, res, next) => {
                 },
             },
         ]);
-        const topBuyers = aggregatedTopBuyers[0].revenue.map((item, index) => ({
-            ...item, month: item._id.month, year: item._id.year, ...aggregatedTopBuyers[0].amount[index]
-        }));
+        const topBuyers = aggregatedTopBuyers[0].revenue.map((item, index) => (Object.assign(Object.assign(Object.assign({}, item), { month: item._id.month, year: item._id.year }), aggregatedTopBuyers[0].amount[index])));
         res.status(200).json(topBuyers);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const getChartData = async (req, res, next) => {
+});
+const getChartData = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = await (0, combineChartData_1.default)(order_1.default.aggregate([...sale_1.default.revenue("monthly")]), order_1.default.aggregate([...sale_1.default.amount("monthly")]));
+        const data = yield (0, combineChartData_1.default)(order_1.default.aggregate([...sale_1.default.revenue("monthly")]), order_1.default.aggregate([...sale_1.default.amount("monthly")]));
         res.status(200).json(data);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
+});
 exports.default = { getChartData, getTopBuyers, getMostSoldProducts };

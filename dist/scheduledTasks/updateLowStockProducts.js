@@ -12,20 +12,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const common_1 = require("../types/common");
-const minmax_1 = __importDefault(require("./pipelines/minmax"));
-exports.default = (_a) => __awaiter(void 0, [_a], void 0, function* ({ collection, req, res, allowedMinMaxProps }) {
-    var _b;
-    const prop = req.params.prop.toLowerCase();
-    if (!prop || !Object.keys(allowedMinMaxProps).includes(prop)) {
-        res.status(400).send("The Prop you sent is not valid.");
-        return null;
+const product_1 = __importDefault(require("../models/product"));
+exports.default = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const lowStockProducts = yield product_1.default.find({ quantity: { $lt: 10 } });
+        if (lowStockProducts.length === 0) {
+            return;
+        }
+        for (const product of lowStockProducts) {
+            const randomIncrease = Math.floor(Math.random() * 51) + 50;
+            product.quantity += randomIncrease;
+            yield product.save();
+        }
     }
-    const transformedProp = allowedMinMaxProps[prop];
-    const query = Object.keys(common_1.computedFilterProps).includes(prop)
-        ? minmax_1.default[transformedProp]
-        : minmax_1.default.get(transformedProp);
-    const data = (yield collection.aggregate(query));
-    const range = (_b = data[0]) === null || _b === void 0 ? void 0 : _b.range.map((item) => Number(item));
-    return range;
+    catch (error) {
+        throw error;
+    }
 });

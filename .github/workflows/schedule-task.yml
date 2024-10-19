@@ -1,0 +1,25 @@
+name: Run Scheduled Task
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch: 
+
+jobs:
+  run-task:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Scheduled Task API
+        id: call-task
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${{ secrets.SECRET_TOKEN }}" https://greenadminpanel-lm1thad5.b4a.run/admin/run-scheduled-task)
+          echo "Response status: $response"
+          echo "::set-output name=status::$response"
+
+      - name: Check Response and Retry if Necessary
+        if: steps.call-task.outputs.status != '200'
+        run: exit 1 
+
+    strategy:
+      fail-fast: false
+      max-attempts: 3

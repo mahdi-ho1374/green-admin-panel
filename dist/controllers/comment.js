@@ -1,4 +1,24 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -15,9 +35,9 @@ const comment_4 = require("../types/comment");
 const getSearchResults_1 = __importDefault(require("../helpers/getSearchResults"));
 const order_1 = __importDefault(require("../helpers/pipelines/populate/order"));
 const express_validator_1 = require("express-validator");
-const getComments = async (req, res, next) => {
+const getComments = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { data, lastPage } = await (0, getCollectionData_1.default)({
+        const { data, lastPage } = yield (0, getCollectionData_1.default)({
             collection: comment_1.default,
             res,
             req,
@@ -29,11 +49,8 @@ const getComments = async (req, res, next) => {
             return;
         }
         const transformedComments = data.map((comment) => {
-            const { userId, ...rest } = comment;
-            return {
-                user: userId,
-                ...rest,
-            };
+            const { userId } = comment, rest = __rest(comment, ["userId"]);
+            return Object.assign({ user: userId }, rest);
         });
         res.status(200).json({ data: transformedComments, lastPage });
     }
@@ -41,8 +58,8 @@ const getComments = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const updateComment = async (req, res, next) => {
+});
+const updateComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(422).json({ error: errors.array()[0].msg });
@@ -65,7 +82,7 @@ const updateComment = async (req, res, next) => {
     }
     const fields = { seen, approved, replied, text, repliedText };
     try {
-        const updatedComment = await comment_1.default.findByIdAndUpdate(_id, fields, {
+        const updatedComment = yield comment_1.default.findByIdAndUpdate(_id, fields, {
             new: false,
         })
             .lean()
@@ -80,8 +97,8 @@ const updateComment = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const addComment = async (req, res, next) => {
+});
+const addComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(422).json({ error: errors.array()[0].msg });
@@ -111,32 +128,32 @@ const addComment = async (req, res, next) => {
         repliedText,
     });
     try {
-        const user = await user_1.default.findById(userId);
+        const user = yield user_1.default.findById(userId);
         if (!user) {
             res.status(404).json({
                 error: "User not found. Please ensure that the specified user exists.",
             });
             return;
         }
-        const createdComment = await newComment.save();
+        const createdComment = yield newComment.save();
         res.status(201).json(createdComment);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const getChartData = async (req, res, next) => {
+});
+const getChartData = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = await comment_1.default.aggregate(comment_3.default.createdAt("monthly"));
+        const data = yield comment_1.default.aggregate(comment_3.default.createdAt("monthly"));
         res.status(200).json(data);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const queryComment = async (req, res, next) => {
+});
+const queryComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const term = String(req.query.term);
     const autoComplete = Boolean(req.query.autoComplete);
     if (!term) {
@@ -148,14 +165,14 @@ const queryComment = async (req, res, next) => {
     try {
         const commentFields = Object.values(comment_4.AllowedSearchFields);
         const userFields = Object.values(user_2.AllowedSearchFields);
-        const commentsData1 = await (0, getSearchResults_1.default)({
+        const commentsData1 = yield (0, getSearchResults_1.default)({
             model: comment_1.default,
             fields: commentFields,
             autoComplete,
             term,
             nextStages: order_1.default.userId,
         });
-        const usersData = await (0, getSearchResults_1.default)({
+        const usersData = yield (0, getSearchResults_1.default)({
             model: user_1.default,
             fields: userFields,
             autoComplete,
@@ -166,7 +183,7 @@ const queryComment = async (req, res, next) => {
             return;
         }
         const usersIds = usersData.map((user) => new mongodb_1.ObjectId(user._id));
-        const commentsData2 = await comment_1.default.find({ userId: { $in: usersIds } })
+        const commentsData2 = yield comment_1.default.find({ userId: { $in: usersIds } })
             .populate("userId")
             .lean();
         const duplicatedCommentData = [...commentsData1, ...commentsData2];
@@ -180,11 +197,8 @@ const queryComment = async (req, res, next) => {
             return result;
         }, []);
         const transformedData = data.map((comment) => {
-            const { userId, ...rest } = comment;
-            return {
-                user: userId,
-                ...rest,
-            };
+            const { userId } = comment, rest = __rest(comment, ["userId"]);
+            return Object.assign({ user: userId }, rest);
         });
         res.status(200).json(transformedData);
     }
@@ -192,7 +206,7 @@ const queryComment = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
+});
 exports.default = {
     getComments,
     updateComment,

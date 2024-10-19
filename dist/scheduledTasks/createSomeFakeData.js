@@ -1,18 +1,27 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const faker_1 = require("@faker-js/faker");
-const user_1 = __importDefault(require("../../models/user"));
-const order_1 = __importDefault(require("../../models/order"));
-const comment_1 = __importDefault(require("../../models/comment"));
+const user_1 = __importDefault(require("../models/user"));
+const order_1 = __importDefault(require("../models/order"));
+const comment_1 = __importDefault(require("../models/comment"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const product_1 = __importDefault(require("../../models/product"));
-const order_2 = require("../../types/order");
-const createSession_1 = __importDefault(require("../../helpers/order/createSession"));
-const order_3 = require("../../types/order");
-const createSomeFakeData = async () => {
+const product_1 = __importDefault(require("../models/product"));
+const order_2 = require("../types/order");
+const createSession_1 = __importDefault(require("../helpers/order/createSession"));
+const order_3 = require("../types/order");
+const createSomeFakeData = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         for (let i = 0; i < faker_1.faker.number.int({ min: 0, max: 3 }); i++) {
             let username = faker_1.faker.internet.userName();
@@ -28,15 +37,15 @@ const createSomeFakeData = async () => {
             });
             const totalSpent = 0;
             const orders = [];
-            const isDuplicatedUser = async (email, username) => {
-                return await user_1.default.findOne({
+            const isDuplicatedUser = (email, username) => __awaiter(void 0, void 0, void 0, function* () {
+                return yield user_1.default.findOne({
                     $or: [{ email }, { username }],
                 }).collation({ locale: "en", strength: 2 });
-            };
+            });
             do {
                 username = faker_1.faker.internet.userName();
                 email = faker_1.faker.internet.email();
-            } while (await isDuplicatedUser(email, username));
+            } while (yield isDuplicatedUser(email, username));
             const newUser = new user_1.default({
                 username,
                 password,
@@ -50,13 +59,13 @@ const createSomeFakeData = async () => {
                 orders,
                 totalSpent,
             });
-            newUser.password = await bcryptjs_1.default.hash(password, 12);
-            await newUser.save();
+            newUser.password = yield bcryptjs_1.default.hash(password, 12);
+            yield newUser.save();
         }
         for (let i = 0; i < faker_1.faker.number.int({ min: 0, max: 4 }); i++) {
             const productsCount = faker_1.faker.number.int({ min: 1, max: 5 });
             faker_1.faker.number.int;
-            const randomProducts = await product_1.default.aggregate([
+            const randomProducts = yield product_1.default.aggregate([
                 { $sample: { size: productsCount } },
             ]);
             const randomUsersPipeLine = [
@@ -71,7 +80,7 @@ const createSomeFakeData = async () => {
                     },
                 });
             }
-            const randomUsers = await user_1.default.aggregate([...randomUsersPipeLine]);
+            const randomUsers = yield user_1.default.aggregate([...randomUsersPipeLine]);
             const userId = randomUsers[0]._id;
             const randomAmount = faker_1.faker.number.int({ min: 1, max: 3 });
             const items = randomProducts.map((product) => {
@@ -103,7 +112,7 @@ const createSomeFakeData = async () => {
                 totalPrice,
                 status,
             });
-            const createdOrder = await (0, createSession_1.default)({
+            const createdOrder = yield (0, createSession_1.default)({
                 fields: newOrder,
                 isNew: true,
                 salesNumber: order_3.Operator.INC,
@@ -112,7 +121,7 @@ const createSomeFakeData = async () => {
             });
         }
         for (let i = 0; i < faker_1.faker.number.int({ min: 0, max: 1 }); i++) {
-            const randomUsers = await user_1.default.aggregate([{ $sample: { size: 1 } }]);
+            const randomUsers = yield user_1.default.aggregate([{ $sample: { size: 1 } }]);
             const userId = randomUsers[0]._id;
             const text = faker_1.faker.lorem.sentence();
             const approved = Math.random() > 0.5 ? true : false;
@@ -127,9 +136,11 @@ const createSomeFakeData = async () => {
                 replied,
                 repliedText,
             });
-            const createdComment = await newComment.save();
+            const createdComment = yield newComment.save();
         }
     }
-    catch (err) { }
-};
+    catch (err) {
+        throw err;
+    }
+});
 exports.default = createSomeFakeData;

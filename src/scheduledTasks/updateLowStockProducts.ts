@@ -1,4 +1,4 @@
-import Product from "../../models/product";
+import Product from "../models/product";
 
 export default async () => {
   try {
@@ -13,5 +13,7 @@ export default async () => {
       product.quantity += randomIncrease;
       await product.save();
     }
-  } catch (error) {}
+  } catch (error) {
+    throw error;
+  }
 };

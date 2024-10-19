@@ -14,20 +14,6 @@ var Status;
     Status["CANCELED"] = "canceled";
     Status["PENDING"] = "pending";
 })(Status || (exports.Status = Status = {}));
-exports.allowedSortProps = {
-    id: "_id",
-    _id: "_id",
-    user: "user",
-    totalprice: "totalPrice",
-    itemscount: "itemsCount",
-    productscount: "productsCount",
-    ...common_1.allowedDateSortProps
-};
-exports.allowedFilterProps = {
-    totalprice: "totalPrice",
-    itemscount: "itemsCount",
-    productscount: "productsCount",
-    status: "status",
-    ...common_1.allowedDateFilterProps
-};
+exports.allowedSortProps = Object.assign({ id: "_id", _id: "_id", user: "user", totalprice: "totalPrice", itemscount: "itemsCount", productscount: "productsCount" }, common_1.allowedDateSortProps);
+exports.allowedFilterProps = Object.assign({ totalprice: "totalPrice", itemscount: "itemsCount", productscount: "productsCount", status: "status" }, common_1.allowedDateFilterProps);
 exports.allowedMinMaxProps = exports.allowedFilterProps;

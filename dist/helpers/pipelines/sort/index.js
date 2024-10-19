@@ -14,13 +14,7 @@ const sort = (sortProp, sortType) => [
         },
     },
 ];
-const sortQueries = {
-    ...product_1.default,
-    ...user_1.default,
-    ...order_1.default,
-    user: basedOnUser_1.default,
-    get: (sortProp) => (sortType) => {
+const sortQueries = Object.assign(Object.assign(Object.assign(Object.assign({}, product_1.default), user_1.default), order_1.default), { user: basedOnUser_1.default, get: (sortProp) => (sortType) => {
         return sort(sortProp, sortType);
-    },
-};
+    } });
 exports.default = sortQueries;

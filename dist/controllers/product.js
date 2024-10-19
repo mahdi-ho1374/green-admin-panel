@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -14,9 +23,9 @@ const order_1 = __importDefault(require("../models/order"));
 const product_4 = require("../types/product");
 const getSearchResults_1 = __importDefault(require("../helpers/getSearchResults"));
 const express_validator_1 = require("express-validator");
-const getProducts = async (req, res, next) => {
+const getProducts = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { data, lastPage } = await (0, getCollectionData_1.default)({
+        const { data, lastPage } = yield (0, getCollectionData_1.default)({
             collection: product_1.default,
             req,
             res,
@@ -32,8 +41,8 @@ const getProducts = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const updateProduct = async (req, res, next) => {
+});
+const updateProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(422).json({ error: errors.array()[0].msg });
@@ -46,7 +55,7 @@ const updateProduct = async (req, res, next) => {
     const description = body.description;
     const fields = { price, quantity, description };
     try {
-        const updatedProduct = await product_1.default.findByIdAndUpdate(_id, fields, {
+        const updatedProduct = yield product_1.default.findByIdAndUpdate(_id, fields, {
             new: false,
         });
         updatedProduct
@@ -57,8 +66,8 @@ const updateProduct = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const addProduct = async (req, res, next) => {
+});
+const addProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(422).json({ error: errors.array()[0].msg });
@@ -80,22 +89,22 @@ const addProduct = async (req, res, next) => {
         category
     });
     try {
-        const createdProduct = await newProduct.save();
+        const createdProduct = yield newProduct.save();
         res.status(201).json(createdProduct);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const queryProductName = async (req, res, next) => {
+});
+const queryProductName = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const name = req.query.name;
     if (!name.trim()) {
         res.status(400).json({ error: "Search term is empty. Please provide a valid search term." });
         return;
     }
     try {
-        const filteredProducts = await product_1.default.find({
+        const filteredProducts = yield product_1.default.find({
             name: new RegExp(name, 'i')
         });
         res
@@ -106,22 +115,22 @@ const queryProductName = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const getProductsById = async (req, res, next) => {
+});
+const getProductsById = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const productIds = body.ids.map((_id) => new mongodb_1.ObjectId(_id));
     try {
-        const products = await product_1.default.find({ _id: { $in: productIds } }).exec();
+        const products = yield product_1.default.find({ _id: { $in: productIds } }).exec();
         res.status(200).json(products);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const getMinMax = async (req, res, next) => {
+});
+const getMinMax = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const range = await (0, getMinMaxOfProp_1.default)({
+        const range = yield (0, getMinMaxOfProp_1.default)({
             collection: product_1.default,
             req,
             res,
@@ -136,18 +145,18 @@ const getMinMax = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const getChartData = async (req, res, next) => {
+});
+const getChartData = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = await order_1.default.aggregate(product_3.default.category("monthly"));
+        const data = yield order_1.default.aggregate(product_3.default.category("monthly"));
         res.status(200).json(data);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const queryProduct = async (req, res, next) => {
+});
+const queryProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const term = String(req.query.term);
     const autoComplete = Boolean(req.query.autoComplete);
     if (!term.trim()) {
@@ -156,14 +165,14 @@ const queryProduct = async (req, res, next) => {
     }
     try {
         const fields = Object.values(product_4.AllowedSearchFields);
-        const data = await (0, getSearchResults_1.default)({ model: product_1.default, fields, autoComplete, term });
+        const data = yield (0, getSearchResults_1.default)({ model: product_1.default, fields, autoComplete, term });
         res.status(200).json(data);
     }
     catch (err) {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
+});
 exports.default = {
     updateProduct,
     addProduct,

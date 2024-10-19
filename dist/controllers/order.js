@@ -1,4 +1,24 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -19,9 +39,9 @@ const product_2 = __importDefault(require("../models/product"));
 const mongodb_1 = require("mongodb");
 const checkProductAvailability_1 = __importDefault(require("../helpers/order/checkProductAvailability"));
 const express_validator_1 = require("express-validator");
-const getOrders = async (req, res, next) => {
+const getOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { data, lastPage } = await (0, getCollectionData_1.default)({
+        const { data, lastPage } = yield (0, getCollectionData_1.default)({
             collection: order_1.default,
             res,
             req,
@@ -33,11 +53,8 @@ const getOrders = async (req, res, next) => {
             return;
         }
         const transformedOrders = data.map((order) => {
-            const { userId, ...rest } = order;
-            return {
-                user: userId,
-                ...rest,
-            };
+            const { userId } = order, rest = __rest(order, ["userId"]);
+            return Object.assign({ user: userId }, rest);
         });
         res.status(200).json({ data: transformedOrders, lastPage });
     }
@@ -45,8 +62,8 @@ const getOrders = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const updateOrder = async (req, res, next) => {
+});
+const updateOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(422).json({ error: errors.array()[0].msg });
@@ -57,14 +74,14 @@ const updateOrder = async (req, res, next) => {
     const items = body.items;
     const status = body.status;
     try {
-        const order = await order_1.default.findById(_id);
+        const order = yield order_1.default.findById(_id);
         if (!order) {
             res
                 .status(404)
                 .json({ error: "The order you are trying to update doesn't exist" });
             return;
         }
-        const correspondingItems = await (0, checkProductAvailability_1.default)({
+        const correspondingItems = yield (0, checkProductAvailability_1.default)({
             items,
             res,
             previousItems: order.items,
@@ -95,11 +112,11 @@ const updateOrder = async (req, res, next) => {
         if ([order_2.Status.DELIVERED, order_2.Status.PENDING].includes(status) &&
             order.status === order_2.Status.PENDING) {
             const updatedOrder = !isItemsChanged
-                ? await (0, createSession_1.default)({
+                ? yield (0, createSession_1.default)({
                     fields,
                     _id,
                 })
-                : await (0, createSession_1.default)({
+                : yield (0, createSession_1.default)({
                     fields,
                     order,
                     salesNumber: order_2.Operator.INC,
@@ -113,7 +130,7 @@ const updateOrder = async (req, res, next) => {
         if (order.status !== order_2.Status.CANCELED &&
             status === order_2.Status.CANCELED &&
             !isItemsChanged) {
-            const updatedOrder = await (0, createSession_1.default)({
+            const updatedOrder = yield (0, createSession_1.default)({
                 fields,
                 salesNumber: order_2.Operator.DEC,
                 _id,
@@ -153,8 +170,8 @@ const updateOrder = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const addOrder = async (req, res, next) => {
+});
+const addOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {
         res.status(422).json({ error: errors.array()[0].msg });
@@ -165,7 +182,7 @@ const addOrder = async (req, res, next) => {
     let items = body.items;
     const status = body.status;
     try {
-        const user = await user_1.default.findById(userId);
+        const user = yield user_1.default.findById(userId);
         if (!user) {
             res
                 .status(404)
@@ -174,7 +191,7 @@ const addOrder = async (req, res, next) => {
             });
             return;
         }
-        const correspondingItems = await (0, checkProductAvailability_1.default)({ items, res });
+        const correspondingItems = yield (0, checkProductAvailability_1.default)({ items, res });
         const isNullItemThere = correspondingItems.some((item) => item === null);
         if (isNullItemThere) {
             return;
@@ -199,8 +216,8 @@ const addOrder = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const queryOrders = async (req, res, next) => {
+});
+const queryOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const term = String(req.query.term);
     const autoComplete = Boolean(req.query.autoComplete);
     if (!term) {
@@ -214,13 +231,13 @@ const queryOrders = async (req, res, next) => {
     try {
         const productFields = Object.values(product_1.AllowedSearchFields);
         const userFields = Object.values(user_2.AllowedSearchFields);
-        const productsData = await (0, getSearchResults_1.default)({
+        const productsData = yield (0, getSearchResults_1.default)({
             model: product_2.default,
             fields: productFields,
             autoComplete,
             term,
         });
-        const usersData = await (0, getSearchResults_1.default)({
+        const usersData = yield (0, getSearchResults_1.default)({
             model: user_1.default,
             fields: userFields,
             autoComplete,
@@ -232,10 +249,10 @@ const queryOrders = async (req, res, next) => {
         }
         const usersIds = usersData.map((user) => new mongodb_1.ObjectId(user._id));
         const productsIds = productsData.map((product) => new mongodb_1.ObjectId(product._id));
-        const ordersData1 = await order_1.default.find({ userId: { $in: usersIds } })
+        const ordersData1 = yield order_1.default.find({ userId: { $in: usersIds } })
             .populate("userId")
             .lean();
-        const ordersData2 = await order_1.default.find({
+        const ordersData2 = yield order_1.default.find({
             items: {
                 $elemMatch: {
                     _id: {
@@ -257,11 +274,8 @@ const queryOrders = async (req, res, next) => {
             return result;
         }, []);
         const transformedData = data.map((order) => {
-            const { userId, ...rest } = order;
-            return {
-                user: userId,
-                ...rest,
-            };
+            const { userId } = order, rest = __rest(order, ["userId"]);
+            return Object.assign({ user: userId }, rest);
         });
         res.status(200).json(transformedData);
     }
@@ -269,10 +283,10 @@ const queryOrders = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const getMinMax = async (req, res, next) => {
+});
+const getMinMax = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const range = await (0, getMinMaxOfProp_1.default)({
+        const range = yield (0, getMinMaxOfProp_1.default)({
             collection: order_1.default,
             req,
             res,
@@ -287,10 +301,10 @@ const getMinMax = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
-const getChartData = async (req, res, next) => {
+});
+const getChartData = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = await order_1.default.aggregate([
+        const data = yield order_1.default.aggregate([
             ...order_4.default.createdAt("monthly"),
         ]);
         res.status(200).json(data);
@@ -299,7 +313,7 @@ const getChartData = async (req, res, next) => {
         const error = new error_1.Erroro(err, 500);
         return next(error);
     }
-};
+});
 exports.default = {
     updateOrder,
     addOrder,
