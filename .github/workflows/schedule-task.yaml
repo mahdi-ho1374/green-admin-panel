@@ -16,10 +16,15 @@ jobs:
           echo "Response status: $response"
           echo "::set-output name=status::$response"
 
-      - name: Check Response and Retry if Necessary
+      - name: Check Response and Fail if Necessary
         if: steps.call-task.outputs.status != '200'
-        run: exit 1 
+        run: exit 1
 
     strategy:
       fail-fast: false
-      max-attempts: 3
+      matrix:
+        include:
+          - attempt: 1
+          - attempt: 2
+          - attempt: 3
+
