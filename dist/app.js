@@ -61,7 +61,7 @@ app.get("/admin/run-scheduled-task", (req, res, next) => __awaiter(void 0, void 
         res.status(200).json({ message: "Scheduled task executed successfully" });
     }
     catch (err) {
-        next(err);
+        return next(err);
     }
 }));
 app.use("/admin", product_1.default);

@@ -80,7 +80,7 @@ const updateUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
             email,
         });
         if (errorMessage) {
-            res.status(400).send(errorMessage);
+            res.status(400).json({ error: errorMessage });
             return;
         }
         const updatedUser = yield user_2.default.findByIdAndUpdate(_id, fields, {

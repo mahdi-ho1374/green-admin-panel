@@ -30,4 +30,5 @@ router.put("/comment/edit", [
 ], comment_1.default.updateComment);
 router.post("/comment/add", [...addOrUpdateComment], comment_1.default.addComment);
 router.get("/comments/:currentPage", comment_1.default.getComments);
+router.delete("/comment/delete/:id", [(0, express_validator_1.param)("id").trim().custom((value) => !(0, mongoose_1.isValidObjectId)(value) ? Promise.reject("Comment's id is invalid") : true)], comment_1.default.deleteComment);
 exports.default = router;

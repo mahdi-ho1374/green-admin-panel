@@ -12,19 +12,16 @@ jobs:
       - name: Call Scheduled Task API
         id: call-task
         run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${{ secrets.SECRET_TOKEN }}" https://greenadminpanel-lm1thad5.b4a.run/admin/run-scheduled-task)
-          echo "Response status: $response"
-          echo "::set-output name=status::$response"
+          response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -H "Authorization: Bearer ${{ secrets.SECRET_TOKEN }}" https://your-backend.com/admin/run-scheduled-task)
+          echo "Full Response:"
+          echo "$response"
+          http_code=$(echo "$response" | tail -n1 | sed 's/HTTP_CODE://')
+          echo "HTTP Status Code: $http_code"
+          
+          # Fail if the status code is not 200
+          if [ "$http_code" -ne 200 ]; then
+            echo "Request failed with status code $http_code"
+            exit 1
+          fi
 
-      - name: Check Response and Fail if Necessary
-        if: steps.call-task.outputs.status != '200'
-        run: exit 1
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - attempt: 1
-          - attempt: 2
-          - attempt: 3
 

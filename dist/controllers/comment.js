@@ -207,10 +207,32 @@ const queryComment = (req, res, next) => __awaiter(void 0, void 0, void 0, funct
         return next(error);
     }
 });
+const deleteComment = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const id = (_a = req.params) === null || _a === void 0 ? void 0 : _a.id;
+    const errors = (0, express_validator_1.validationResult)(req);
+    if (!errors.isEmpty()) {
+        res.status(422).json({ error: errors.array()[0].msg });
+        return;
+    }
+    try {
+        const result = yield comment_1.default.deleteOne({ _id: new mongodb_1.ObjectId(id) });
+        if (result.deletedCount === 0) {
+            res.status(404).json({ error: "The comment you are trying to delete doesn't exist" });
+            return;
+        }
+        res.status(200).send({ message: "Comment deleted successfully" });
+    }
+    catch (err) {
+        const error = new error_1.Erroro(err, 500);
+        return next(error);
+    }
+});
 exports.default = {
     getComments,
     updateComment,
     addComment,
     getChartData,
     queryComment,
+    deleteComment
 };

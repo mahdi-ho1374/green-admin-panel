@@ -1,6 +1,6 @@
 import { Router } from "express";
 import commentControllers from "../controllers/comment";
-import { body } from "express-validator";
+import { body,param } from "express-validator";
 import { isValidObjectId } from "mongoose";
 
 const addOrUpdateComment = [
@@ -44,5 +44,7 @@ router.post(
 );
 
 router.get("/comments/:currentPage", commentControllers.getComments);
+
+router.delete("/comment/delete/:id",[param("id").trim().custom((value) => !isValidObjectId(value) ? Promise.reject("Comment's id is invalid") : true)],commentControllers.deleteComment);
 
 export default router;

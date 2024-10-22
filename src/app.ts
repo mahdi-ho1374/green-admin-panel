@@ -21,7 +21,8 @@ if (process.env.NODE_ENV !== "production") {
 const app = express();
 
 const corsOptions = {
-  origin: function (
+  origin: 
+  function (
     origin: string | undefined,
     callback: (err: Error | null, allow?: boolean) => void
   ) {
@@ -53,11 +54,11 @@ app.get(
         res.status(403).json({ error: "Unauthorized" });
         return;
       }
-      await createSomeFakeData();
-      await updateLowStockProducts();
+    await createSomeFakeData();
+    await updateLowStockProducts();
       res.status(200).json({ message: "Scheduled task executed successfully" });
     } catch (err: any) {
-      next(err);
+      return next(err);
     }
   }
 );

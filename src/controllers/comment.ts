@@ -142,7 +142,7 @@ const queryComment: Controller = async (req, res, next) => {
 
   const autoComplete = Boolean(req.query.autoComplete);
   if (!term) {
-     res.status(400).json({
+    res.status(400).json({
       error: "Search term is empty. Please provide a valid search term.",
     });
     return;
@@ -163,11 +163,11 @@ const queryComment: Controller = async (req, res, next) => {
       autoComplete,
       term,
     });
-   
+
     if (autoComplete) {
       res.status(200).json([...new Set([...commentsData1, ...usersData])]);
       return;
-    } 
+    }
     const usersIds: ObjectId[] = usersData.map(
       (user) => new ObjectId(user._id)
     );
@@ -200,10 +200,31 @@ const queryComment: Controller = async (req, res, next) => {
   }
 };
 
+const deleteComment: Controller = async (req, res, next) => {
+  const id = req.params?.id;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(422).json({ error: errors.array()[0].msg });
+    return;
+  }
+  try {
+    const result = await Comment.deleteOne({ _id: new ObjectId(id) });
+    if (result.deletedCount === 0) {
+      res.status(404).json({ error: "The comment you are trying to delete doesn't exist" });
+      return;
+    }
+    res.status(200).send({ message: "Comment deleted successfully" });
+  } catch (err: any) {
+    const error = new Erroro(err, 500);
+    return next(error);
+  }
+};
+
 export default {
   getComments,
   updateComment,
   addComment,
   getChartData,
   queryComment,
+  deleteComment
 };

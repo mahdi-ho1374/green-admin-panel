@@ -80,7 +80,7 @@ const updateUser: Controller = async (req, res, next) => {
       email,
     });
     if (errorMessage) {
-      res.status(400).send(errorMessage);
+      res.status(400).json({error: errorMessage});
       return;
     }
     const updatedUser = await User.findByIdAndUpdate(_id, fields, {
