@@ -12,7 +12,7 @@ jobs:
       - name: Call Scheduled Task API
         id: call-task
         run: |
-          response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -H "Authorization: Bearer ${{ secrets.SECRET_TOKEN }}" https://your-backend.com/admin/run-scheduled-task)
+          response=$(curl -s -w "\nHTTP_CODE:%{http_code}" -H "Authorization: Bearer ${{ secrets.SECRET_TOKEN }}" https://greenadminpanel-lm1thad5.b4a.run/admin/run-scheduled-task)
           echo "Full Response:"
           echo "$response"
           http_code=$(echo "$response" | tail -n1 | sed 's/HTTP_CODE://')
