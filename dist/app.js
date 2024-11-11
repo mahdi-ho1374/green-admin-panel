@@ -31,15 +31,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 const app = (0, express_1.default)();
 const corsOptions = {
-    origin: function (origin, callback) {
-        const allowedOrigins = [process.env.FRONTEND_URL, "https://github.com"];
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            callback(null, true);
-        }
-        else {
-            callback(new Error("Not allowed by CORS"));
-        }
-    },
+    origin: process.env.FRONTEND_URL,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
     optionsSuccessStatus: 204,

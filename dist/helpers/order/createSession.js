@@ -12,14 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const app_1 = __importDefault(require("../../app"));
-// import connection from "../../initial/createData";
+// import connection from "../../app";
+const createFakeData_1 = __importDefault(require("../../createFakeData"));
 const order_1 = __importDefault(require("../../models/order"));
 const createBulk_1 = __importDefault(require("./createBulk"));
 const product_1 = __importDefault(require("../../models/product"));
 const user_1 = __importDefault(require("../../models/user"));
 exports.default = (_a) => __awaiter(void 0, [_a], void 0, function* ({ fields, _id, order, quantity, salesNumber, totalSpent, isNew, }) {
-    const session = yield app_1.default.startSession();
+    const session = yield createFakeData_1.default.startSession();
     try {
         session.startTransaction();
         let createdOrder;

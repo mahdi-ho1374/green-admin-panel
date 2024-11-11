@@ -9,7 +9,6 @@ import Product from "../models/product";
 import { Status } from "../types/order";
 import createSession from "../helpers/order/createSession";
 import { Operator } from "../types/order";
-import { Z_ERRNO } from "zlib";
 
 const createSomeFakeData = async () => {
   try {

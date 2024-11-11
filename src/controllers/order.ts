@@ -27,6 +27,7 @@ import Product from "../models/product";
 import { ObjectId } from "mongodb";
 import checkProductAvailability from "../helpers/order/checkProductAvailability";
 import { validationResult } from "express-validator";
+import mergeDuplicatedItems from "../helpers/order/mergeDuplicatedItems";
 
 const getOrders: Controller = async (req, res, next) => {
   try {
@@ -65,7 +66,7 @@ const updateOrder: Controller = async (req, res, next) => {
   }
   const body: UpdateOrderBody = req.body;
   const _id = body._id as string;
-  const items = body.items as ProductItem[];
+  const items = mergeDuplicatedItems(body.items as ProductItem[]);
   const status = body.status as Status;
   try {
     const order = await Order.findById(_id);
@@ -75,20 +76,22 @@ const updateOrder: Controller = async (req, res, next) => {
         .json({ error: "The order you are trying to update doesn't exist" });
       return;
     }
+    
     const correspondingItems = await checkProductAvailability({
       items,
       res,
       previousItems: order.items,
     });
+    
     const isNullItemThere = correspondingItems.find((item) => item === null);
     if (isNullItemThere) {
       return;
     }
+    
     const totalPrice = parseFloat(correspondingItems!.reduce(
       (totalPrice, item) => totalPrice + item!.amount * (item!.price as number),
       0
     ).toFixed(2));
-
     const fields = {
       items: correspondingItems as ProductItem[],
       totalPrice,
@@ -189,7 +192,7 @@ const addOrder: Controller = async (req, res, next) => {
   }
   const body: AddOrderBody = req.body;
   const userId = body.userId;
-  let items = body.items;
+  const items = mergeDuplicatedItems(body.items);
   const status = body.status;
   try {
     const user = await User.findById(userId);

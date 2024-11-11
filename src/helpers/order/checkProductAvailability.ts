@@ -14,7 +14,7 @@ export default async ({items,res,previousItems}: CheckProductAvailabilityProps) 
     const products = await Product.find({_id: {$in: itemsIds}}) as unknown as IProduct[];
     const correspondingItems = items.map(item => {
       const correspondingProduct = products.find(product => product!._id!.toString() === item._id.toString());
-      const previousProduct = previousItems ? previousItems.find(product => product._id.toString() === item._id.toString()) : {amount: 0};
+      const previousProduct = previousItems ? previousItems.find(product => product._id.toString() === item._id.toString()) || {amount: 0} : {amount: 0};
       if(!correspondingProduct) {
         res.status(404).send("One of products not found.Make sure the product exist in our shop.");
         return null;

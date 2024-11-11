@@ -127,3 +127,7 @@ out
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# files only used on developing process
+createFakeData.ts
+createFakeData.js

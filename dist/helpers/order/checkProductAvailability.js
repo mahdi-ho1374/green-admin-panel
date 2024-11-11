@@ -18,7 +18,7 @@ exports.default = (_a) => __awaiter(void 0, [_a], void 0, function* ({ items, re
     const products = yield product_1.default.find({ _id: { $in: itemsIds } });
     const correspondingItems = items.map(item => {
         const correspondingProduct = products.find(product => product._id.toString() === item._id.toString());
-        const previousProduct = previousItems ? previousItems.find(product => product._id.toString() === item._id.toString()) : { amount: 0 };
+        const previousProduct = previousItems ? previousItems.find(product => product._id.toString() === item._id.toString()) || { amount: 0 } : { amount: 0 };
         if (!correspondingProduct) {
             res.status(404).send("One of products not found.Make sure the product exist in our shop.");
             return null;

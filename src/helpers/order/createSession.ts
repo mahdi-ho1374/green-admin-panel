@@ -1,8 +1,8 @@
 import { UpdateOrderBody } from "../../types/reqBodyInterfaces";
 import { IOrder } from "../../types/order";
 import { Operator } from "../../types/order";
-import connection from "../../app";
-// import connection from "../../initial/createData";
+// import connection from "../../app";
+import connection from "../../createFakeData";
 import Order from "../../models/order";
 import { AnyBulkWriteOperation } from "mongodb";
 import createBulk from "./createBulk";

@@ -39,6 +39,7 @@ const product_2 = __importDefault(require("../models/product"));
 const mongodb_1 = require("mongodb");
 const checkProductAvailability_1 = __importDefault(require("../helpers/order/checkProductAvailability"));
 const express_validator_1 = require("express-validator");
+const mergeDuplicatedItems_1 = __importDefault(require("../helpers/order/mergeDuplicatedItems"));
 const getOrders = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { data, lastPage } = yield (0, getCollectionData_1.default)({
@@ -71,7 +72,7 @@ const updateOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, functi
     }
     const body = req.body;
     const _id = body._id;
-    const items = body.items;
+    const items = (0, mergeDuplicatedItems_1.default)(body.items);
     const status = body.status;
     try {
         const order = yield order_1.default.findById(_id);
@@ -179,7 +180,7 @@ const addOrder = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
     }
     const body = req.body;
     const userId = body.userId;
-    let items = body.items;
+    const items = (0, mergeDuplicatedItems_1.default)(body.items);
     const status = body.status;
     try {
         const user = yield user_1.default.findById(userId);
